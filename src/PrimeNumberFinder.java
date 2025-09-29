@@ -47,7 +47,8 @@ public class PrimeNumberFinder extends HttpServlet {
     }
 
     /**
-     * 查找指定范围内的所有素数（使用埃拉托斯特尼筛法）
+     * 之前使用试除法,体验...
+     * 改为使用埃拉托斯特尼筛法,后续可考虑使用欧拉筛等算法
      * @param start 起始数字
      * @param end 结束数字
      * @return 素数列表
