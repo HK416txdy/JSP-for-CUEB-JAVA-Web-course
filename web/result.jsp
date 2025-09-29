@@ -13,14 +13,15 @@
         </p>
         
         <%
+            @SuppressWarnings("unchecked")
             List<Long> primes = (List<Long>) request.getAttribute("primes");
-        %>if (primes.isEmpty()) {
-
-    <p>在指定范围内没有找到素数</p>
-
-    } else {
-
-    <p>共找到 <%= primes.size() %> 个素数:</p>
+            if (primes.isEmpty()) {
+        %>
+            <p>在指定范围内没有找到素数</p>
+        <%
+            } else {
+        %>
+            <p>共找到 <%= primes.size() %> 个素数:</p>
             <ul>
             <%
                 for (Long prime : primes) {
@@ -30,9 +31,9 @@
                 }
             %>
             </ul>
-
-    }<%
-    %>
+        <%
+            }
+        %>
     <% } else { %>
         <p style="color: red;">错误：<%= request.getAttribute("error") %></p>
     <% } %>
