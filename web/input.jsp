@@ -1,6 +1,5 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%
-    // 设置请求编码为UTF-8，防止中文乱码
     request.setCharacterEncoding("UTF-8");
     
     // 获取从first.jsp传递过来的参数

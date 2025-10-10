@@ -1,7 +1,6 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%@ page import="java.util.*" %>
 <%
-    // 设置请求编码为UTF-8，防止中文乱码
     request.setCharacterEncoding("UTF-8");
 %>
 <html>
