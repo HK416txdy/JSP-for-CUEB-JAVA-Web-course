@@ -83,6 +83,7 @@
         <%
             Boolean gameOver = (Boolean) request.getAttribute("gameOver");
             Boolean tooManyGuesses = (Boolean) request.getAttribute("tooManyGuesses");
+            Integer guessCount = (Integer) request.getAttribute("guessCount");
             
             if (gameOver != null && gameOver) {
                 Integer finalGuess = (Integer) request.getAttribute("finalGuess");
@@ -90,21 +91,20 @@
                 <div class="game-over">
                     <h2>游戏结束!</h2>
                     <p>系统成功猜出了你心中的数字：<strong><%= finalGuess %></strong></p>
-                    <p>总共猜测次数：<strong>${guessCount}</strong> 次</p>
+                    <p>总共猜测次数：<strong><%= guessCount %></strong> 次</p>
                     <a href="game?restart=true" class="btn btn-restart">重新开始游戏</a>
                 </div>
         <%
             } else if (tooManyGuesses != null && tooManyGuesses) {
         %>
                 <div class="game-over">
-                    <h2>游戏异常!</h2>
-                    <p>猜测次数已经超过10次，请检查是否正确反馈了每次猜测结果。</p>
+                    <h2>你小子作弊</h2>
+                    <p>猜测次数已经超过10次，请检查玩家是不是在作弊</p>
                     <a href="game?restart=true" class="btn btn-restart">重新开始游戏</a>
                 </div>
         <%
             } else {
                 Integer guess = (Integer) request.getAttribute("guess");
-                Integer guessCount = (Integer) request.getAttribute("guessCount");
                 Integer low = (Integer) request.getAttribute("low");
                 Integer high = (Integer) request.getAttribute("high");
         %>
