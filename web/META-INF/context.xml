@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Context>
+    <!-- PostgreSQL数据库连接池配置 -->
+    <Resource name="jdbc/TestDB" 
+              auth="Container" 
+              type="javax.sql.DataSource"
+              maxTotal="20" 
+              maxIdle="10" 
+              maxWaitMillis="10000"
+              username="postgres" 
+              password="123456" 
+              driverClassName="org.postgresql.Driver"
+              url="jdbc:postgresql://localhost:5432/testdb"
+              removeAbandonedOnBorrow="true"
+              removeAbandonedTimeout="60"
+              logAbandoned="true"/>
+</Context>

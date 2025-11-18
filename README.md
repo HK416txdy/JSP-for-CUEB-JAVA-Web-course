@@ -1,55 +1,38 @@
-# 电子商务商城系统
+#
+## 数据库配置
+课程老师使用JNDI数据源方式连接MySQL数据库,请注意你使用的数据库以及配置方式
+本项目使用JNDI数据源方式连接PostgreSQL数据库，配置信息位于`web/META-INF/context.xml`文件中：
 
-这是一个基于JSP的简单电子商务商城系统，具有商品展示和购物车功能。
-
-## 功能特点
-
-1. 商品列表展示：在首页(index.jsp)展示所有商品
-2. 商品详情查看：点击商品可查看详细信息
-3. 购物车管理：
-   - 添加商品到购物车
-   - 修改购物车中商品数量
-   - 从购物车中移除商品
-   - 查看购物车总价和商品总数
-
-## 文件结构
-
-```
-src/
-  main/
-    java/
-      com/
-        example/
-          model/
-            - Product.java          // 商品实体类
-            - ProductDAO.java       // 商品数据访问对象
-            - Cart.java             // 购物车类
-            - CartItem.java         // 购物车项目类
-
-web/
-  - index.jsp             // 商品列表页面
-  - product.jsp           // 商品详情页面
-  - cart.jsp              // 购物车页面
-  - cartAction.jsp        // 购物车操作处理页面
-  - WEB-INF/
-    - web.xml             // Web应用配置文件
+```xml
+<Resource name="jdbc/TestDB" 
+          auth="Container" 
+          type="javax.sql.DataSource"
+          maxTotal="20" 
+          maxIdle="10" 
+          maxWaitMillis="10000"
+          username="postgres" 
+          password="123456" 
+          driverClassName="org.postgresql.Driver"
+          url="jdbc:postgresql://localhost:5432/testdb"/>
 ```
 
-## 使用说明
+### JNDI方式优势：
 
-1. 将项目部署到支持JSP的Web服务器（如Apache Tomcat）
-2. 访问index.jsp查看商品列表
-3. 点击"查看详情"查看商品详细信息
-4. 在商品详情页可将商品添加到购物车
-5. 点击页面顶部的购物车链接查看购物车内容
-6. 在购物车页面可以：
-   - 修改商品数量
-   - 移除商品
-   - 清空购物车
-   - 查看总价
+1. **连接池管理**：自动管理数据库连接，提高性能
+2. **配置集中化**：数据库配置独立于应用程序代码
+3. **资源监控**：便于监控和管理数据库连接使用情况
+4. **安全性**：数据库凭证集中管理，避免硬编码
+
+### 配置步骤：
+
+1. 确保PostgreSQL JDBC驱动已放置在`web/WEB-INF/lib/`目录下
+2. 修改`context.xml`中的数据库连接参数（URL、用户名、密码）
+3. 确保Tomcat服务器已启动PostgreSQL服务
+4. 部署应用后访问`dbunifiedtest.jsp`进行测试
 
 ## 注意事项
 
 - 商品图片应放在web/images/目录下
 - 当前版本为演示版本，没有连接真实数据库，商品信息存储在内存中
 - 结算功能仅为演示，实际使用需连接支付系统
+- 数据库测试功能仅供开发和部署验证使用
