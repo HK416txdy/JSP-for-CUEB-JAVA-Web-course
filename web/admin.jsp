@@ -44,6 +44,34 @@
         }
     }
     
+    // 处理编辑考试请求
+    if ("edit".equals(request.getParameter("action"))) {
+        String examId = request.getParameter("examId");
+        String examLocation = request.getParameter("examLocation");
+        String examDate = request.getParameter("examDate");
+        String examTime = request.getParameter("examTime");
+        String examMajor = request.getParameter("examMajor");
+        
+        if (examId != null && !examId.isEmpty()) {
+            Exam exam = new Exam();
+            exam.setExamName(examId);
+            exam.setClassroom(examLocation);
+            exam.setSubject(examMajor);
+            
+            // 组合日期和时间
+            if (examDate != null && !examDate.isEmpty() && examTime != null && !examTime.isEmpty()) {
+                java.sql.Timestamp timestamp = java.sql.Timestamp.valueOf(examDate + " " + examTime);
+                exam.setExamTime(timestamp);
+            }
+            
+            if (examDAO.updateExam(exam)) {
+                request.setAttribute("message", "考试信息更新成功！");
+            } else {
+                request.setAttribute("error", "考试信息更新失败！");
+            }
+        }
+    }
+    
     // 处理删除考试请求
     if ("delete".equals(request.getParameter("action"))) {
         String examId = request.getParameter("examId");
@@ -94,10 +122,6 @@
             color: #333;
         }
         
-        .user-info {
-            color: #666;
-        }
-        
         .logout-btn {
             background-color: #dc3545;
             color: white;
@@ -121,13 +145,14 @@
             margin-bottom: 15px;
         }
         
-        .form-group label {
+        label {
             display: block;
             margin-bottom: 5px;
             font-weight: bold;
+            color: #555;
         }
         
-        .form-group input {
+        input[type="text"], input[type="date"], input[type="time"] {
             width: 100%;
             padding: 8px;
             border: 1px solid #ddd;
@@ -142,6 +167,7 @@
             border: none;
             border-radius: 5px;
             cursor: pointer;
+            font-size: 16px;
         }
         
         .btn:hover {
@@ -154,6 +180,15 @@
         
         .btn-danger:hover {
             background-color: #c82333;
+        }
+        
+        .btn-warning {
+            background-color: #ffc107;
+            color: #212529;
+        }
+        
+        .btn-warning:hover {
+            background-color: #e0a800;
         }
         
         table {
@@ -170,7 +205,6 @@
         
         th {
             background-color: #f8f9fa;
-            font-weight: bold;
             color: #333;
         }
         
@@ -206,7 +240,46 @@
         .action-cell {
             white-space: nowrap;
         }
+        
+        /* 编辑表单样式 */
+        .edit-form {
+            background-color: #fff3cd;
+            border: 1px solid #ffeeba;
+            padding: 15px;
+            border-radius: 5px;
+            margin: 15px 0;
+        }
     </style>
+    <script>
+        function showEditForm(examId, examLocation, examDate, examTime, examMajor) {
+            // 隐藏所有编辑表单
+            var editForms = document.getElementsByClassName('edit-form');
+            for (var i = 0; i < editForms.length; i++) {
+                editForms[i].style.display = 'none';
+            }
+            
+            // 显示对应考试的编辑表单
+            var formId = 'editForm_' + examId;
+            var form = document.getElementById(formId);
+            if (form) {
+                form.style.display = 'block';
+                
+                // 填充表单字段
+                form.querySelector('[name="examLocation"]').value = examLocation || '';
+                form.querySelector('[name="examDate"]').value = examDate || '';
+                form.querySelector('[name="examTime"]').value = examTime || '';
+                form.querySelector('[name="examMajor"]').value = examMajor || '';
+            }
+        }
+        
+        function cancelEdit(examId) {
+            var formId = 'editForm_' + examId;
+            var form = document.getElementById(formId);
+            if (form) {
+                form.style.display = 'none';
+            }
+        }
+    </script>
 </head>
 <body>
     <div class="container">
@@ -274,6 +347,15 @@
                 <tbody>
                 <%
                     for (Exam exam : exams) {
+                        // 提取日期和时间部分用于编辑表单
+                        String examDateStr = "";
+                        String examTimeStr = "";
+                        if (exam.getExamTime() != null) {
+                            java.text.SimpleDateFormat dateFormat = new java.text.SimpleDateFormat("yyyy-MM-dd");
+                            java.text.SimpleDateFormat timeFormat = new java.text.SimpleDateFormat("HH:mm:ss");
+                            examDateStr = dateFormat.format(exam.getExamTime());
+                            examTimeStr = timeFormat.format(exam.getExamTime());
+                        }
                 %>
                     <tr>
                         <td><%= exam.getExamName() %></td>
@@ -281,12 +363,53 @@
                         <td><%= exam.getClassroom() %></td>
                         <td><%= exam.getSubject() %></td>
                         <td class="action-cell">
+                            <button type="button" class="btn btn-warning" 
+                                    onclick="showEditForm('<%= exam.getExamName() %>', '<%= exam.getClassroom() != null ? exam.getClassroom() : "" %>', '<%= examDateStr %>', '<%= examTimeStr %>', '<%= exam.getSubject() != null ? exam.getSubject() : "" %>')">
+                                编辑
+                            </button>
                             <form method="post" style="display: inline;">
                                 <input type="hidden" name="action" value="delete">
                                 <input type="hidden" name="examId" value="<%= exam.getExamName() %>">
                                 <button type="submit" class="btn btn-danger" 
                                         onclick="return confirm('确定要删除考试 <%= exam.getExamName() %> 吗？')">删除</button>
                             </form>
+                            
+                            <!-- 编辑表单 -->
+                            <div id="editForm_<%= exam.getExamName() %>" class="edit-form" style="display:none;">
+                                <h3>编辑考试信息</h3>
+                                <form method="post">
+                                    <input type="hidden" name="action" value="edit">
+                                    <input type="hidden" name="examId" value="<%= exam.getExamName() %>">
+                                    
+                                    <div class="form-group">
+                                        <label>考试ID:</label>
+                                        <input type="text" value="<%= exam.getExamName() %>" disabled>
+                                    </div>
+                                    
+                                    <div class="form-group">
+                                        <label for="editLocation_<%= exam.getExamName() %>">考试地点:</label>
+                                        <input type="text" id="editLocation_<%= exam.getExamName() %>" name="examLocation" placeholder="考试地点">
+                                    </div>
+                                    
+                                    <div class="form-group">
+                                        <label for="editDate_<%= exam.getExamName() %>">考试日期:</label>
+                                        <input type="date" id="editDate_<%= exam.getExamName() %>" name="examDate" placeholder="考试日期">
+                                    </div>
+                                    
+                                    <div class="form-group">
+                                        <label for="editTime_<%= exam.getExamName() %>">考试时间:</label>
+                                        <input type="time" id="editTime_<%= exam.getExamName() %>" name="examTime" placeholder="考试时间">
+                                    </div>
+                                    
+                                    <div class="form-group">
+                                        <label for="editMajor_<%= exam.getExamName() %>">考试科目:</label>
+                                        <input type="text" id="editMajor_<%= exam.getExamName() %>" name="examMajor" placeholder="考试科目">
+                                    </div>
+                                    
+                                    <button type="submit" class="btn">保存更改</button>
+                                    <button type="button" class="btn btn-danger" onclick="cancelEdit('<%= exam.getExamName() %>')">取消</button>
+                                </form>
+                            </div>
                         </td>
                     </tr>
                 <%
