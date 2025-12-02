@@ -84,6 +84,39 @@ public class ExamDAO {
         }
     }
     
+    // 更新考试信息
+    public boolean updateExam(Exam exam) {
+        try (Connection conn = DBUtil.getConnection()) {
+            String sql = "UPDATE TEST SET examinationName=?, examinationLocation=?, examinationDate=?, examinationTime=?, examinationMajor=? WHERE examinationID=?";
+            PreparedStatement pstmt = conn.prepareStatement(sql);
+            
+            pstmt.setString(1, exam.getExamName());
+            pstmt.setString(2, exam.getClassroom());
+            
+            // 分离Timestamp为Date和Time
+            if (exam.getExamTime() != null) {
+                Date examDate = new Date(exam.getExamTime().getTime());
+                Time examTime = new Time(exam.getExamTime().getTime());
+                pstmt.setDate(3, examDate);
+                pstmt.setTime(4, examTime);
+            } else {
+                pstmt.setNull(3, java.sql.Types.DATE);
+                pstmt.setNull(4, java.sql.Types.TIME);
+            }
+            
+            pstmt.setString(5, exam.getSubject());
+            pstmt.setString(6, exam.getExamName()); // WHERE条件使用examinationID
+            
+            int rowsAffected = pstmt.executeUpdate();
+            pstmt.close();
+            
+            return rowsAffected > 0;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+    
     // 删除考试
     public boolean deleteExam(String examId) {
         try (Connection conn = DBUtil.getConnection()) {
