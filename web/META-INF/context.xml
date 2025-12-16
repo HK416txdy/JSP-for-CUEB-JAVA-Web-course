@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Context>
+    <!-- Tomcat-style JNDI DataSource resource; adjust url/username/password as needed -->
+    <Resource name="jdbc/postgres"
+              auth="Container"
+              type="javax.sql.DataSource"
+              factory="org.apache.tomcat.jdbc.pool.DataSourceFactory"
+              driverClassName="org.postgresql.Driver"
+              url="jdbc:postgresql://localhost:5432/postgres"
+              username="postgres" password="123456"
+              maxActive="20"
+              maxIdle="10"
+              maxWait="10000"/>
+</Context>
